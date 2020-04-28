@@ -1,0 +1,5 @@
+config.json
+out
+lambda.zip
+package-lock.json
+node_modules/

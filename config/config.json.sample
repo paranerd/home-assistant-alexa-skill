@@ -1,0 +1,9 @@
+{
+    "token": "abcdefg12345",
+    "apiUrl": "https://example.com",
+    "manufacturer": "Smart Home",
+    "discoveryPatterns": [
+      "switch.",
+      "light.wohnzimmer"
+    ]
+}
