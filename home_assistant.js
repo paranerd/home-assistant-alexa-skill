@@ -1,27 +1,26 @@
 const fs = require('fs');
 const util = require('./util');
-const tv = require('./special_devices/tv');
+const logger = require('./logger');
 
 const config = JSON.parse(fs.readFileSync('config/config.json'));
 const capabilities = JSON.parse(fs.readFileSync('config/capabilities.json'));
+const specialDevices = JSON.parse(fs.readFileSync('config/special_devices.json'));
+
+const API_URL = config.apiUrl;
+const HEADERS = {
+  'Authorization': 'Bearer ' + config.token,
+  'Content-Type': 'application/json'
+};
 
 const manufacturer = config.manufacturer;
 
-const specialDevices = {
-  "remote.living_room": {
-    "categories": ["TV"],
-    "capabilities": [
-      "power",
-      "channel",
-      "volume",
-      "playback"
-    ],
-    "handler": tv.setDeviceState
-  }
-}
-
+/**
+ * Handle device discovery
+ *
+ * @return {Object}
+ */
 async function discover() {
-  let entities = await util.callApi('states');
+  let entities = await util.get(API_URL, 'states', {}, HEADERS);
   let endpoints = [];
 
   let devicesByPattern = new RegExp("^(" + config.discoveryPatterns.join("|") + ")");
@@ -42,13 +41,23 @@ async function discover() {
   return {endpoints: endpoints};
 }
 
+/**
+ * Build an Alexa interpretable endpoint
+ *
+ * @param {Object} entity
+ * @param {Object} deviceConfig
+ *
+ * @return {Object}
+ */
 function buildEndpoint(entity, deviceConfig) {
   let domain = entity.entity_id.split(".")[0];
   let entityCategories = [];
-  let entityCapabilities = [capabilities.base]
+  let entityCapabilities = [capabilities.base];
+  let friendlyName = entity.attributes.friendly_name;
+  let description = friendlyName;
 
   if (deviceConfig) {
-    console.log(deviceConfig);
+    friendlyName = (friendlyName in deviceConfig) ? deviceConfig["friendlyName"] : friendlyName;
     entityCategories = entityCategories.concat(deviceConfig["categories"]);
     entityCapabilities = entityCapabilities.concat(deviceConfig["capabilities"].map(x => capabilities[x]));
   }
@@ -69,13 +78,18 @@ function buildEndpoint(entity, deviceConfig) {
   return {
     "endpointId": entity.entity_id,
     "manufacturerName": manufacturer,
-    "friendlyName": entity.attributes.friendly_name,
-    "description": entity.attributes.friendly_name,
+    "friendlyName": friendlyName,
+    "description": description,
     "displayCategories": entityCategories,
     "capabilities": entityCapabilities
   }
 }
 
+/**
+ * Create an Alexa interpretable scene
+ *
+ * @return {Object}
+ */
 function createScene() {
   return {
     "endpointId": "scene.glotze",
@@ -87,83 +101,43 @@ function createScene() {
   }
 }
 
-async function setDeviceState(entityId, command, data = {}) {
-  // Special devices
-  if (entityId in specialDevices) {
-    return await specialDevices[entityId]["handler"](entityId, command, data);
-  }
+/**
+ * Set device state
+ *
+ * @param {Object} request Alexa directive
+ *
+ * @return {mixed}
+ */
+async function setDeviceState(request) {
+    let entityId = request.directive.endpoint.endpointId;
+    let domain = util.getDomain(request.directive.endpoint.endpointId);
+    let command = request.directive.header.name;
+    let service = util.commandAlexaToHome(command);
+    let data = request.directive.payload;
+    data = Object.keys(data).length ? data : {entity_id: entityId};
 
-  let domain = getDomain(entityId);
-  let service = commandAlexaToHome(command);
-  data = Object.keys(data).length ? data : {entity_id: entityId};
+    // Special devices
+    if (entityId in specialDevices && specialDevices[entityId]["handler"]) {
+        const device = require('./special_devices/' + specialDevices[entityId]["handler"]);
+        return await device.setDeviceState(entityId, command, data);
+    }
 
-  let res = await util.callApi('services/' + domain + '/' + service, 'POST', data);
-  let state = commandToState(command);
+    let res = await util.post(API_URL, 'services/' + domain + '/' + service, data, HEADERS);
+    let state = util.commandToState(command);
 
-  return state;
+    return state;
 }
 
-function getDomain(entityId) {
-  return entityId.split(".")[0];
-}
-
-function commandAlexaToHome(command) {
-  switch (command) {
-    case 'TurnOn':
-      return 'turn_on';
-
-    case 'TurnOff':
-      return 'turn_off';
-
-    case 'Play':
-      return 'media_play';
-
-    case 'Pause':
-      return 'media_pause';
-
-    case 'Stop':
-      return 'media_stop';
-
-    default:
-      return null;
-  }
-}
-
-function stateHomeToAlexa(state) {
-  switch (state) {
-    case 'on':
-      return 'ON';
-
-    case 'off':
-      return 'OFF';
-
-    case 'media_play':
-      return 'Play';
-
-    case 'media_pause':
-      return 'Pause';
-
-    case 'media_stop':
-      return 'Stop';
-
-    default:
-      return null;
-  }
-}
-
-function commandToState(command) {
-  switch (command) {
-    case 'TurnOn':
-      return 'on';
-
-    case 'TurnOff':
-      return 'off';
-  }
-}
-
+/**
+ * Get device state
+ *
+ * @param {string} entityId
+ *
+ * @return {mixed}
+ */
 async function getDeviceState(entityId) {
-  let res = await util.callApi('states/' + entityId);
-  let state = stateHomeToAlexa(res.state);
+  let res = await util.get(API_URL, 'states/' + entityId, {}, HEADERS);
+  let state = util.stateHomeToAlexa(res.state);
 
   return state;
 }
@@ -176,7 +150,7 @@ async function getDeviceState(entityId) {
  */
 async function sendToken(payload) {
   try {
-    let res = await util.callApi('token', 'POST', payload);
+    let res = await util.post(API_URL, 'token', payload, HEADERS);
     console.log("Successfully sent token", res.data);
   } catch (e) {
     console.log("Error caught: ", e);

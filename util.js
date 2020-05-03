@@ -1,12 +1,4 @@
 const axios = require('axios');
-const fs = require('fs');
-
-const config = JSON.parse(fs.readFileSync('config/config.json'));
-const apiUrl = config.apiUrl;
-const headers = {
-  'Authorization': 'Bearer ' + config.token,
-  'Content-Type': 'application/json'
-};
 
 function paramsToQueryString(params) {
   let queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
@@ -14,20 +6,80 @@ function paramsToQueryString(params) {
   return queryString
 }
 
-async function callApi(apiEndpoint, method = 'GET', params = {}) {
-  // GET
-  if (method.toLowerCase() == 'get') {
+async function get(url, path, params = {}, headers = {}) {
     let queryString = paramsToQueryString(params);
-    let res = await axios.get(apiUrl + '/' + apiEndpoint + '?' + queryString, {headers: headers});
+    let res = await axios.get(url + '/' + path + '?' + queryString, {headers: headers});
     return res.data;
+}
+
+async function post(url, path, params = {}, headers = {}) {
+    let res = await axios.post(url + '/' + path, params, {headers: headers});
+    return res.data;
+}
+
+function getDomain(entityId) {
+  return entityId.split(".")[0];
+}
+
+function commandAlexaToHome(command) {
+  switch (command) {
+    case 'TurnOn':
+      return 'turn_on';
+
+    case 'TurnOff':
+      return 'turn_off';
+
+    case 'Play':
+      return 'media_play';
+
+    case 'Pause':
+      return 'media_pause';
+
+    case 'Stop':
+      return 'media_stop';
+
+    default:
+      return null;
   }
-  // POST
-  else {
-    let res = await axios.post(apiUrl + '/' + apiEndpoint, params, {headers: headers});
-    return res.data;
+}
+
+function stateHomeToAlexa(state) {
+  switch (state) {
+    case 'on':
+      return 'ON';
+
+    case 'off':
+      return 'OFF';
+
+    case 'media_play':
+      return 'Play';
+
+    case 'media_pause':
+      return 'Pause';
+
+    case 'media_stop':
+      return 'Stop';
+
+    default:
+      return null;
+  }
+}
+
+function commandToState(command) {
+  switch (command) {
+    case 'TurnOn':
+      return 'on';
+
+    case 'TurnOff':
+      return 'off';
   }
 }
 
 module.exports = {
-  callApi: callApi
+  get: get,
+  post: post,
+  commandAlexaToHome: commandAlexaToHome,
+  stateHomeToAlexa: stateHomeToAlexa,
+  commandToState: commandToState,
+  getDomain: getDomain
 }

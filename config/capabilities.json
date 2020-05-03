@@ -1,65 +1,90 @@
 {
-  "base": {
-    "type": "AlexaInterface",
-    "interface": "Alexa",
-    "version": "3"
-  },
-  "playback": {
-    "type": "AlexaInterface",
-    "interface": "Alexa.PlaybackController",
-    "version": "3",
-    "supportedOperations" : ["Play", "Pause", "Stop"]
-  },
-  "volume": {
-    "type": "AlexaInterface",
-    "interface": "Alexa.Speaker",
-    "version": "3",
-    "properties": {
-      "supported": [
-        {
-          "name": "volume"
+    "base": {
+        "type": "AlexaInterface",
+        "interface": "Alexa",
+        "version": "3"
+    },
+    "playback": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.PlaybackController",
+        "version": "3",
+        "supportedOperations" : ["Play", "Pause", "Stop"]
+    },
+    "volume": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.Speaker",
+        "version": "3",
+        "properties": {
+            "supported": [
+                {
+                    "name": "volume"
+                },
+                {
+                    "name": "muted"
+                }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+        }
+    },
+    "power": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.PowerController",
+        "version": "3",
+        "properties": {
+            "supported": [
+                {
+                    "name": "powerState"
+                }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+        }
+    },
+    "channel": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.ChannelController",
+        "version": "3",
+        "properties": {
+            "supported": [
+                {
+                    "name": "channel"
+                }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
+        }
+    },
+    "scene": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.SceneController",
+        "version" : "3",
+        "supportsDeactivation" : false,
+        "proactivelyReported" : true
+    },
+    "input": {
+        "type": "AlexaInterface",
+        "interface": "Alexa.InputController",
+        "version": "3",
+        "properties": {
+            "supported": [
+                {
+                    "name": "input"
+                }
+            ],
+            "proactivelyReported": true,
+            "retrievable": true
         },
-        {
-          "name": "muted"
-        }
-      ],
-      "proactivelyReported": true,
-      "retrievable": true
+        "inputs": [
+            {
+                "name": "TV"
+            },
+            {
+                "name": "HDMI 1"
+            },
+            {
+                "name": "HDMI 2"
+            }
+        ]
     }
-  },
-  "power": {
-    "type": "AlexaInterface",
-    "interface": "Alexa.PowerController",
-    "version": "3",
-    "properties": {
-      "supported": [
-        {
-          "name": "powerState"
-        }
-      ],
-      "proactivelyReported": true,
-      "retrievable": true
-    }
-  },
-  "channel": {
-    "type": "AlexaInterface",
-    "interface": "Alexa.ChannelController",
-    "version": "3",
-    "properties": {
-      "supported": [
-        {
-          "name": "channel"
-        }
-      ],
-      "proactivelyReported": true,
-      "retrievable": true
-    }
-  },
-  "scene": {
-    "type": "AlexaInterface",
-    "interface": "Alexa.SceneController",
-    "version" : "3",
-    "supportsDeactivation" : false,
-    "proactivelyReported" : true
-  }
 }

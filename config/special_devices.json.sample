@@ -1,0 +1,13 @@
+{
+    "home-assistant-entity-id": {
+        "categories": ["Alexa category"],
+        "capabilities": [
+            "power",
+            "channel",
+            "volume",
+            "playback",
+            "input"
+        ],
+        "handler": "handler filename relative to special_devices/ without extension"
+    }
+}

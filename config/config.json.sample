@@ -1,6 +1,8 @@
 {
-    "token": "abcdefg12345",
     "apiUrl": "https://example.com",
+    "token": "abcdefg12345",
+    "loggerUrl": https://logger.com/endpoint",
+    "loggerAuth": "bcdefg123456",
     "manufacturer": "Smart Home",
     "discoveryPatterns": [
       "switch.",

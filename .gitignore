@@ -1,4 +1,5 @@
 config.json
+special_devices.json
 out
 lambda.zip
 package-lock.json

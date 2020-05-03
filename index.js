@@ -1,12 +1,13 @@
-const axios = require('axios');
 const homeAssistant = require('./home_assistant');
 
 exports.handler = async (request, context) => {
+    console.log("DEBUG | ", "Request | ", request);
+
     if (request.directive.header.namespace === 'Alexa.Discovery' && request.directive.header.name === 'Discover') {
-        await handleDiscovery(request, context, "");
+        await handleDiscovery(request, context);
     }
     else if (request.directive.header.namespace === 'Alexa.Authorization') {
-        if (request.directive.header.name === 'AcceptGrant') {
+        if (['AcceptGrant'].includes(request.directive.header.name)) {
             await handleAcceptGrant(request, context);
         }
     }
@@ -19,17 +20,17 @@ exports.handler = async (request, context) => {
         await handlePlaybackControl(request, context);
     }
     else if (request.directive.header.namespace === 'Alexa') {
-        if (request.directive.header.name === 'ReportState') {
+        if (['ReportState'].includes(request.directive.header.name)) {
             await handleReportState(request, context);
         }
     }
     else if (request.directive.header.namespace === 'Alexa.ChannelController') {
-        if (request.directive.header.name === 'ChangeChannel') {
+        if (['ChangeChannel', 'SkipChannels'].includes(request.directive.header.name)) {
             await handleChangeChannel(request, context);
         }
     }
     else if (request.directive.header.namespace === 'Alexa.Speaker') {
-        if (['AdjustVolume', 'SetVolume'].includes(request.directive.header.name)) {
+        if (['AdjustVolume', 'SetVolume', 'SetMute'].includes(request.directive.header.name)) {
             await handleVolumeControl(request, context);
         }
     }
@@ -38,20 +39,18 @@ exports.handler = async (request, context) => {
             await handleSceneControl(request, context);
         }
     }
-    /*else if (request.directive.header.namespace === 'Alexa.InputController') {
-        // Update this!
-        // See https://developer.amazon.com/de-DE/docs/alexa/device-apis/alexa-discovery.html#discover-entertainment for an example
-        if (request.directive.header.name === 'ChangeChannel') {
-            console.log("DEBUG:", "ChangeChannel request caught", JSON.stringify(request));
-            await handleChangeChannel(request, context);
+    else if (request.directive.header.namespace === 'Alexa.InputController') {
+        if (['SelectInput'].includes(request.directive.header.name)) {
+            await handleInputSelect(request, context);
         }
-    }*/
+    }
     else {
         console.log("Unhandled", JSON.stringify(request));
     }
 
     async function handleAcceptGrant(request, context) {
         await homeAssistant.sendToken(request);
+
         let header = request.directive.header;
         header.name = "AcceptGrant.Response";
         context.succeed({ event: { header: header, payload: {} } });
@@ -66,11 +65,8 @@ exports.handler = async (request, context) => {
     }
 
     async function handlePowerControl(request, context) {
-        // Get device ID passed in during discovery
-        let requestMethod = request.directive.header.name;
-
         // Calling device cloud
-        let state = await homeAssistant.setDeviceState(request.directive.endpoint.endpointId, requestMethod);
+        let state = await homeAssistant.setDeviceState(request);
 
         let contextResult = {
             "properties": [{
@@ -87,10 +83,8 @@ exports.handler = async (request, context) => {
     }
 
     async function handlePlaybackControl(request, context) {
-        let requestMethod = request.directive.header.name;
-
         // Set device
-        await homeAssistant.setDeviceState(request.directive.endpoint.endpointId, requestMethod);
+        await homeAssistant.setDeviceState(request);
 
         let contextResult = {
             "properties": [{
@@ -104,13 +98,13 @@ exports.handler = async (request, context) => {
             }]
         };
 
-        let response = buildResponse(request, contextResult, "Alexa", "Response");
+        let response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
     async function handleChangeChannel(request, context) {
         // Get device state
-        //let state = await homeAssistant.setDeviceState(request.directive.endpoint.endpointId);
+        let channel = await homeAssistant.setDeviceState(request);
 
         // Build context
         let contextResult = {
@@ -119,9 +113,7 @@ exports.handler = async (request, context) => {
                     "namespace": "Alexa.ChannelController",
                     "name": "channel",
                     "value": {
-                        "number": "9",
-                        "callSign": "PBS",
-                        "affiliateCallSign": "KCTS"
+                        "number": channel
                     },
                     "timeOfSample": "2017-02-03T16:20:50.52Z",
                     "uncertaintyInMilliseconds": 0
@@ -141,11 +133,8 @@ exports.handler = async (request, context) => {
     }
 
     async function handleVolumeControl(request, context) {
-        // Get request method
-        let requestMethod = request.directive.header.name;
-
         // Set device
-        await homeAssistant.setDeviceState(request.directive.endpoint.endpointId, requestMethod, request.directive.payload);
+        await homeAssistant.setDeviceState(request);
 
         // Build context
         let contextResult = {
@@ -179,11 +168,8 @@ exports.handler = async (request, context) => {
     }
 
     async function handleSceneControl(request, context) {
-        // Get request method
-        let requestMethod = request.directive.header.name;
-
         // Set device
-        await homeAssistant.setDeviceState(request.directive.endpoint.endpointId, requestMethod, request.directive.payload);
+        await homeAssistant.setDeviceState(request);
 
         let payload = {
 
@@ -193,9 +179,27 @@ exports.handler = async (request, context) => {
         context.succeed(response);
     }
 
+    async function handleInputSelect(request, context) {
+        // Calling device cloud
+        let input = await homeAssistant.setDeviceState(request);
+
+        let contextResult = {
+            "properties": [{
+                "namespace": "Alexa.InputController",
+                "name": "input",
+                "value": input,
+                "timeOfSample": "2017-09-03T16:20:50.52Z",
+                "uncertaintyInMilliseconds": 50
+            }]
+        };
+
+        let response = buildResponse(request, contextResult);
+        context.succeed(response);
+    }
+
     async function handleReportState(request, context) {
         // Get device state
-        let state = await homeAssistant-getDeviceState(request.directive.endpoint.endpointId);
+        let state = await homeAssistant.getDeviceState(request.directive.endpoint.endpointId);
 
         // Build context
         let contextResult = {
@@ -233,7 +237,7 @@ exports.handler = async (request, context) => {
             }
         };
 
-        console.log("DEBUG:", "Response ", JSON.stringify(response));
+        console.log("DEBUG | ", "Response |  ", JSON.stringify(response));
 
         return response;
     }
