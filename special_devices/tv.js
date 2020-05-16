@@ -56,10 +56,19 @@ async function setDeviceState(entityId, command, payload = {}) {
             break;
 
         case 'ChangeChannel':
-            device = '69043881';
-            commands = commands.concat(payload.channel.number.split(""));
-            commands.push("Select");
-            forcedResponse = payload.channel.number;
+            if (payload.channel.number) {
+                device = '69043881';
+                commands = commands.concat(payload.channel.number.split(""));
+                commands.push("Select");
+                forcedResponse = payload.channel.number;
+            }
+            else if (payload.channelMetadata.name) {
+                domain = "script";
+                service = "turn_on";
+                channel = payload.channelMetadata.name.toLowerCase().replace(/[^\w]/, "");
+                entityId = "script.tv_channel_" + channel;
+            }
+
             break;
 
         case 'SkipChannels':
