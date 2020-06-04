@@ -9,8 +9,13 @@ const HEADERS = {
 };
 
 async function log(msg) {
-    let payload = {msg: msg};
-    await util.post(config.loggerUrl, "", payload, HEADERS);
+    if (config.loggerUrl) {
+        let payload = {msg: msg};
+        await util.post(config.loggerUrl, "", payload, HEADERS);
+    }
+    else {
+        console.log(msg);
+    }
 }
 
 module.exports = {
