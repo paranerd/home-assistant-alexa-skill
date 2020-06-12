@@ -62,6 +62,10 @@ async function setDeviceState(entityId, command, payload = {}) {
                 commands.push("Select");
                 forcedResponse = payload.channel.number;
             }
+            else if (payload.channelMetadata.name == 'TV') {
+                device = '69043881'
+                commands.push('InputTv');
+            }
             else if (payload.channelMetadata.name) {
                 domain = "script";
                 service = "turn_on";
