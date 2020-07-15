@@ -29,7 +29,7 @@ Adding special devices requires an entry in the special_devices.json as well as 
 ## Special Devices config
 - categories: Alexa [display categories](https://developer.amazon.com/de-DE/docs/alexa/device-apis/alexa-discovery.html#display-categories)
 - capabilities: Alexa [capability interfaces](https://developer.amazon.com/de-DE/docs/alexa/device-apis/list-of-interfaces.html)
-  currently supported:
+  - currently supported:
   1. playback
   2. volume
   3. power
@@ -37,3 +37,25 @@ Adding special devices requires an entry in the special_devices.json as well as 
   5. scene
   6. input
 - handler: name of the handler file in special_devices/
+
+## Utterances
+### General
+- Turn on: "Alexa, schalte {HA friendly name} an
+- Turn off: "Alexa, schalte {HA friendly name} aus
+
+### Special Device TV
+- Turn on: "Alexa, schalte {HA friendly name} an
+- Turn off: "Alexa, schalte {HA friendly name} aus
+- Switch HDMI input: "Alexa, Eingang HDMI{number}" (probably only works if no other media was started after turning on)
+- Switch to TV: "Alexa, Eingang TV" (does not work, for whatever reason...)
+- Switch channel: "Alexa, Kanal {number}"
+- Switch channel by name: "Alexa, schalte auf {channel name}"
+  - Requires a script.tv_channel{channel name} in HA
+- Volume up: "Alexa, {HA friendly name} {number} lauter"
+  - Might work without {HA friendly name} if no other media was started after turning on
+  - {number} is optional, +1 if omitted
+- Volume down: "Alexa, {HA friendly name} {number} leiser"
+  - Might work without {HA friendly name} if no other media was started after turning on
+  - {number} is optional, -1 if omitted
+- Volume mute: "Alexa, {HA friendly name} lautlos"
+  - Might work without {HA friendly name} if no other media was started after turning on
