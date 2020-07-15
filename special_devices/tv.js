@@ -92,6 +92,14 @@ async function setDeviceState(entityId, command, payload = {}) {
                     commands.push('InputHdmi2');
                     break;
 
+                case 'HDMI 3':
+                    commands.push('InputHdmi3');
+                    break;
+
+                case 'HDMI 4':
+                    commands.push('InputHdmi4');
+                    break;
+
                 default:
                     commands.push('InputTv');
             }
