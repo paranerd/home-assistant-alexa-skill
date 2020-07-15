@@ -12,8 +12,6 @@ const HEADERS = {
   'Content-Type': 'application/json'
 };
 
-const manufacturer = config.manufacturer;
-
 /**
  * Handle device discovery
  *
@@ -70,6 +68,10 @@ function buildEndpoint(entity, deviceConfig) {
     entityCapabilities.push(capabilities.playback);
     entityCapabilities.push(capabilities.volume);
   }
+  else if (domain == 'scene') {
+      entityCategories.push("ACTIVITY_TRIGGER");
+      entityCapabilities.push(capabilities.scene);
+  }
   else {
     entityCategories.push("SWITCH");
     entityCapabilities.push(capabilities.power);
@@ -77,27 +79,11 @@ function buildEndpoint(entity, deviceConfig) {
 
   return {
     "endpointId": entity.entity_id,
-    "manufacturerName": manufacturer,
+    "manufacturerName": config.manufacturer,
     "friendlyName": friendlyName,
     "description": description,
     "displayCategories": entityCategories,
     "capabilities": entityCapabilities
-  }
-}
-
-/**
- * Create an Alexa interpretable scene
- *
- * @return {Object}
- */
-function createScene() {
-  return {
-    "endpointId": "scene.glotze",
-    "manufacturerName": manufacturer,
-    "friendlyName": "Glotze",
-    "description": "Turn on my TV",
-    "displayCategories": ["ACTIVITY_TRIGGER"],
-    "capabilities": [capabilities.scene]
   }
 }
 
