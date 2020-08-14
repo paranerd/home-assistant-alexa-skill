@@ -34,8 +34,6 @@ async function discover() {
     }
   }
 
-  endpoints.push(createScene());
-
   return {endpoints: endpoints};
 }
 
