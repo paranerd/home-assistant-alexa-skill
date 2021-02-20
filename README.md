@@ -5,11 +5,13 @@ This skill provides an interface between the Home Assistant REST API and Alexa
 ## Install the SDK
 Follow [this tutorial](https://docs.aws.amazon.com/de_de/cli/latest/userguide/install-cliv2-linux.html)
 
+## Set up environment variables
+- Rename `/config/env.sample` to `/config/env`
+- API_URL: Url to your Home Assistant API
+- API_TOKEN: [HA Long Lived Access Token](https://www.home-assistant.io/docs/authentication/#your-account-profile)
+
 ## Complete config
-- apiUrl: Url to your Home Assistant API
-- token: [Long Lived Access Token](https://www.home-assistant.io/docs/authentication/#your-account-profile)
-- loggerUrl: (optional) For example a NodeRED endpoint to get instant logging instead - of having to wait for cloud logging to reload
-- loggerAuth: (optional) For Basic Auth of your logger endpoint
+- Rename `/config/config.json.sample` to `/config/config.json`
 - manufacturer: The manufacturer to be displayed in the Alexa App
 - discoveryPatterns: Regex patterns to filter which Home Assistant devices are discovered
 
@@ -36,7 +38,7 @@ Adding special devices requires an entry in the special_devices.json as well as 
   4. channel
   5. scene
   6. input
-- handler: name of the handler file in special_devices/
+- handler: name of the handler file in `special_devices/`
 
 ## Utterances
 ### General

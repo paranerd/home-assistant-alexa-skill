@@ -1,4 +1,5 @@
-config.json
+config/config.json
+config/env
 special_devices.json
 out
 lambda.zip

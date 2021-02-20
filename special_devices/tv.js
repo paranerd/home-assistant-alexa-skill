@@ -1,14 +1,13 @@
 const fs = require('fs');
 const util = require('../util');
-const logger = require('../logger');
 
 // Read config
 const config = JSON.parse(fs.readFileSync(__dirname + '/../config/config.json'));
 
 // Set network info
-const API_URL = config.apiUrl;
+const API_URL = process.env.API_URL;
 const HEADERS = {
-  'Authorization': 'Bearer ' + config.token,
+  'Authorization': 'Bearer ' + process.env.API_TOKEN,
   'Content-Type': 'application/json'
 };
 
@@ -140,7 +139,7 @@ async function setDeviceState(entityId, command, payload = {}) {
     }
 
     // Call API
-    let apiRes = await util.post(API_URL, 'services/' + domain + '/' + service, data, HEADERS);
+    const apiRes = await util.post(API_URL, 'services/' + domain + '/' + service, data, HEADERS);
 
     return forcedResponse ? forcedResponse : apiRes;
 }
