@@ -1,14 +1,10 @@
-const fs = require('fs');
 const util = require('../util');
-
-// Read config
-const config = JSON.parse(fs.readFileSync(__dirname + '/../config/config.json'));
 
 // Set network info
 const API_URL = process.env.API_URL;
 const HEADERS = {
-  'Authorization': 'Bearer ' + process.env.API_TOKEN,
-  'Content-Type': 'application/json'
+    'Authorization': 'Bearer ' + process.env.API_TOKEN,
+    'Content-Type': 'application/json'
 };
 
 /**
@@ -118,24 +114,24 @@ async function setDeviceState(entityId, command, payload = {}) {
     }
 
     // Build data
-    let data = {entity_id: entityId};
+    let data = { entity_id: entityId };
 
     // Set commands
     if (commands.length) {
-        data = Object.assign({command: commands}, data);
+        data = Object.assign({ command: commands }, data);
     }
 
     // Set activity
     if (activity) {
-        data = Object.assign({activity: activity}, data);
+        data = Object.assign({ activity: activity }, data);
     }
     // Set device
     else if (device) {
-        data = Object.assign({device: device}, data);
+        data = Object.assign({ device: device }, data);
     }
     // Set entity ID
     else if (entityId) {
-        data = Object.assign({entity_id: entityId});
+        data = Object.assign({ entity_id: entityId });
     }
 
     // Call API
@@ -145,5 +141,5 @@ async function setDeviceState(entityId, command, payload = {}) {
 }
 
 module.exports = {
-  setDeviceState: setDeviceState
+    setDeviceState: setDeviceState
 }

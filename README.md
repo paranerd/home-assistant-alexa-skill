@@ -7,13 +7,10 @@ Follow [this tutorial](https://docs.aws.amazon.com/de_de/cli/latest/userguide/in
 
 ## Set up environment variables
 - Rename `/config/env.sample` to `/config/env`
-- API_URL: Url to your Home Assistant API
-- API_TOKEN: [HA Long Lived Access Token](https://www.home-assistant.io/docs/authentication/#your-account-profile)
-
-## Complete config
-- Rename `/config/config.json.sample` to `/config/config.json`
-- manufacturer: The manufacturer to be displayed in the Alexa App
-- discoveryPatterns: Regex patterns to filter which Home Assistant devices are discovered
+- `MANUFACTURER`: The manufacturer to be displayed in the Alexa App
+- `API_URL`: Url to your Home Assistant API
+- `API_TOKEN`: [HA Long Lived Access Token](https://www.home-assistant.io/docs/authentication/#your-account-profile)
+- `DEVICE_FILTER`: Regex pattern to filter which Home Assistant devices are discovered
 
 # Deploy
 ## First time

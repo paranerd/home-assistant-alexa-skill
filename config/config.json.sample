@@ -1,7 +1,0 @@
-{
-    "manufacturer": "Smart Home",
-    "discoveryPatterns": [
-      "switch.",
-      "light.wohnzimmer"
-    ]
-}
