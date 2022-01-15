@@ -1,6 +1,6 @@
 const path = require('path');
 require('dotenv').config({path: path.join(__dirname, 'config', 'env')});
-const homeAssistant = require('./home_assistant');
+const homeAssistant = require('./util/ha-api');
 
 exports.handler = async (request, context) => {
     console.log("DEBUG | ", "Request | ", request);
@@ -53,24 +53,24 @@ exports.handler = async (request, context) => {
     async function handleAcceptGrant(request, context) {
         await homeAssistant.sendToken(request);
 
-        let header = request.directive.header;
+        const header = request.directive.header;
         header.name = "AcceptGrant.Response";
         context.succeed({ event: { header: header, payload: {} } });
     }
 
     async function handleDiscovery(request, context) {
-        let payload = await homeAssistant.discover();
+        const payload = await homeAssistant.discover();
 
-        let header = request.directive.header;
+        const header = request.directive.header;
         header.name = "Discover.Response";
         context.succeed({ event: { header: header, payload: payload } });
     }
 
     async function handlePowerControl(request, context) {
         // Calling device cloud
-        let state = await homeAssistant.setDeviceState(request);
+        const state = await homeAssistant.setDeviceState(request);
 
-        let contextResult = {
+        const contextResult = {
             "properties": [{
                 "namespace": "Alexa.PowerController",
                 "name": "powerState",
@@ -80,7 +80,7 @@ exports.handler = async (request, context) => {
             }]
         };
 
-        let response = buildResponse(request, contextResult);
+        const response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
@@ -88,7 +88,7 @@ exports.handler = async (request, context) => {
         // Set device
         await homeAssistant.setDeviceState(request);
 
-        let contextResult = {
+        const contextResult = {
             "properties": [{
                 "namespace": "Alexa.EndpointHealth",
                 "name": "connectivity",
@@ -100,16 +100,16 @@ exports.handler = async (request, context) => {
             }]
         };
 
-        let response = buildResponse(request, contextResult);
+        const response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
     async function handleChangeChannel(request, context) {
         // Get device state
-        let channel = await homeAssistant.setDeviceState(request);
+        const channel = await homeAssistant.setDeviceState(request);
 
         // Build context
-        let contextResult = {
+        const contextResult = {
             "properties": [
                 {
                     "namespace": "Alexa.ChannelController",
@@ -130,7 +130,7 @@ exports.handler = async (request, context) => {
             ]
         };
 
-        let response = buildResponse(request, contextResult);
+        const response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
@@ -139,7 +139,7 @@ exports.handler = async (request, context) => {
         await homeAssistant.setDeviceState(request);
 
         // Build context
-        let contextResult = {
+        const contextResult = {
             "properties": [
                 {
                     "namespace": "Alexa.Speaker",
@@ -165,7 +165,7 @@ exports.handler = async (request, context) => {
             ]
         };
 
-        let response = buildResponse(request, contextResult);
+        const response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
@@ -173,19 +173,19 @@ exports.handler = async (request, context) => {
         // Set device
         await homeAssistant.setDeviceState(request);
 
-        let payload = {
+        const payload = {
 
         }
 
-        let response = buildResponse(request, {}, "Alexa", "Alexa.SceneController", "ActivationStarted", payload);
+        const response = buildResponse(request, {}, "Alexa", "Alexa.SceneController", "ActivationStarted", payload);
         context.succeed(response);
     }
 
     async function handleInputSelect(request, context) {
         // Calling device cloud
-        let input = await homeAssistant.setDeviceState(request);
+        const input = await homeAssistant.setDeviceState(request);
 
-        let contextResult = {
+        const contextResult = {
             "properties": [{
                 "namespace": "Alexa.InputController",
                 "name": "input",
@@ -195,16 +195,16 @@ exports.handler = async (request, context) => {
             }]
         };
 
-        let response = buildResponse(request, contextResult);
+        const response = buildResponse(request, contextResult);
         context.succeed(response);
     }
 
     async function handleReportState(request, context) {
         // Get device state
-        let state = await homeAssistant.getDeviceState(request.directive.endpoint.endpointId);
+        const state = await homeAssistant.getDeviceState(request.directive.endpoint.endpointId);
 
         // Build context
-        let contextResult = {
+        const contextResult = {
             "properties": [{
                 "namespace": "Alexa.PowerController",
                 "name": "powerState",
@@ -214,17 +214,17 @@ exports.handler = async (request, context) => {
             }]
         };
 
-        let response = buildResponse(request, contextResult, "Alexa", "StateReport");
+        const response = buildResponse(request, contextResult, "Alexa", "StateReport");
         context.succeed(response);
     }
 
     function buildResponse(request, contextResult, namespace = "Alexa", responseName = "Response", payload = {}) {
-        let responseHeader = request.directive.header;
+        const responseHeader = request.directive.header;
         responseHeader.namespace = namespace;
         responseHeader.name = responseName;
         responseHeader.messageId = responseHeader.messageId + "-R";
 
-        let response = {
+        const response = {
             context: contextResult,
             event: {
                 header: responseHeader,

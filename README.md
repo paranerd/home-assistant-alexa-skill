@@ -1,31 +1,41 @@
 # Home Assistant Alexa Smart Home Skill
+
 This skill provides an interface between the Home Assistant REST API and Alexa
 
 # Setup
+
 ## Install the SDK
+
 Follow [this tutorial](https://docs.aws.amazon.com/de_de/cli/latest/userguide/install-cliv2-linux.html)
 
 ## Set up environment variables
+
 - Rename `/config/env.sample` to `/config/env`
 - `MANUFACTURER`: The manufacturer to be displayed in the Alexa App
 - `API_URL`: Url to your Home Assistant API
 - `API_TOKEN`: [HA Long Lived Access Token](https://www.home-assistant.io/docs/authentication/#your-account-profile)
-- `DEVICE_FILTER`: Regex pattern to filter which Home Assistant devices are discovered
+- `INCLUDE_PATTERN`: Regex pattern to filter which Home Assistant entities to include (leave empty to include all)
+- `EXCLUDE_PATTERN`: Regex pattern to filter which Home Assistant entities to exclude (leave empty for no exclusions)
 
 # Deploy
+
 ## First time
+
 `zip -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip`
 
 ## Subsequent times
+
 `zip -x "*node_modules*" -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip`
 
 # Special Devices
+
 To add custom behavior you can add special devices.  
-That way you can for example make a switch control a TV.  
+That way you can for example make a switch control a TV.
 
 Adding special devices requires an entry in the special_devices.json as well as a handler file in the special_devices/ directory.
 
 ## Special Devices config
+
 - categories: Alexa [display categories](https://developer.amazon.com/de-DE/docs/alexa/device-apis/alexa-discovery.html#display-categories)
 - capabilities: Alexa [capability interfaces](https://developer.amazon.com/de-DE/docs/alexa/device-apis/list-of-interfaces.html)
   - currently supported:
@@ -38,11 +48,14 @@ Adding special devices requires an entry in the special_devices.json as well as 
 - handler: name of the handler file in `special_devices/`
 
 ## Utterances
+
 ### General
+
 - Turn on: "Alexa, schalte {HA friendly name} an
 - Turn off: "Alexa, schalte {HA friendly name} aus
 
 ### Special Device TV
+
 - Turn on: "Alexa, schalte {HA friendly name} an
 - Turn off: "Alexa, schalte {HA friendly name} aus
 - Switch HDMI input: "Alexa, Eingang HDMI{number}" (probably only works if no other media was started after turning on)
