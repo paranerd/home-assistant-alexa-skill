@@ -7,7 +7,9 @@ const axios = require('axios');
  * @returns {string}
  */
 function paramsToQueryString(params) {
-  return Object.keys(params).map(key => key + '=' + params[key]).join('&');
+  return Object.keys(params)
+    .map((key) => `${key}=${params[key]}`)
+    .join('&');
 }
 
 /**
@@ -20,10 +22,12 @@ function paramsToQueryString(params) {
  * @returns {Object}
  */
 async function get(url, path, params = {}, headers = {}) {
-    const queryString = paramsToQueryString(params);
-    const res = await axios.get(url + '/' + path + '?' + queryString, {headers: headers});
+  const queryString = paramsToQueryString(params);
+  const res = await axios.get(`${url}/${path}?${queryString}`, {
+    headers,
+  });
 
-    return res.data;
+  return res.data;
 }
 
 /**
@@ -36,12 +40,12 @@ async function get(url, path, params = {}, headers = {}) {
  * @returns {Object}
  */
 async function post(url, path, params = {}, headers = {}) {
-    const res = await axios.post(url + '/' + path, params, {headers: headers});
+  const res = await axios.post(`${url}/${path}`, params, { headers });
 
-    return res.data;
+  return res.data;
 }
 
 module.exports = {
-  get: get,
-  post: post,
+  get,
+  post,
 };
