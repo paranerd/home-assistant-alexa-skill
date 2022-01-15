@@ -1,8 +1,8 @@
 const fs = require('fs');
-const http = require('./util/http');
+const http = require('./http');
 
 const capabilities = JSON.parse(fs.readFileSync('config/capabilities.json'));
-const specialDevices = JSON.parse(fs.readFileSync('config/special_devices.json'));
+const specialDevices = fs.existsSync('config/special_devices.json') ? JSON.parse(fs.readFileSync('config/special_devices.json')) : {};
 
 const API_URL = process.env.API_URL;
 const HEADERS = {
