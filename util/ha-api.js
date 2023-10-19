@@ -177,6 +177,7 @@ function buildEndpoint(entity, deviceConfig) {
     entityCapabilities.push(capabilities.power);
   } else if (domain === 'media_player') {
     entityCategories.push('STREAMING_DEVICE');
+    entityCapabilities.push(capabilities.power);
     entityCapabilities.push(capabilities.playback);
     entityCapabilities.push(capabilities.volume);
   } else if (domain === 'scene') {
@@ -213,6 +214,7 @@ async function setDeviceState(request) {
 
   // Special devices
   if (entityId in specialDevices && specialDevices[entityId].handler) {
+    // eslint-disable-next-line import/no-dynamic-require, global-require
     const device = require(`./special_devices/${specialDevices[entityId].handler}`);
     return device.setDeviceState(entityId, command, data);
   }
