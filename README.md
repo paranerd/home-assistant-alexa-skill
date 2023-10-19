@@ -21,11 +21,22 @@ Follow [this tutorial](https://docs.aws.amazon.com/de_de/cli/latest/userguide/in
 
 ## First time
 
-`zip -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip`
+1. Install dependencies
+    ```
+    npm i
+    ```
+
+1. Bundle and upload
+    ```bash
+    zip -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip
+    ```
 
 ## Subsequent times
 
-`zip -x "*node_modules*" -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip`
+1. Bundle and upload (without `node_modules` if no changes)
+    ```bash
+    zip -x "*node_modules*" -x "*out*" -x "*.git*" -r lambda.zip . && aws lambda update-function-code --function-name <name-of-your-lambda-function> --zip-file fileb://lambda.zip
+    ```
 
 # Special Devices
 
