@@ -32,13 +32,14 @@ function getDomain(entityId) {
 /**
  * Translate Alexa command to HA command.
  *
+ * @param {string} domain
  * @param {string} command
  * @returns {string}
  */
-function commandAlexaToHome(command) {
+function commandAlexaToHome(domain, command) {
   switch (command) {
     case 'TurnOn':
-      return 'turn_on';
+      return domain === 'input_button' ? 'press' : 'turn_on';
 
     case 'TurnOff':
       return 'turn_off';
@@ -183,6 +184,9 @@ function buildEndpoint(entity, deviceConfig) {
   } else if (domain === 'scene') {
     entityCategories.push('ACTIVITY_TRIGGER');
     entityCapabilities.push(capabilities.scene);
+  } else if (domain === 'input_button') {
+    entityCategories.push('SWITCH');
+    entityCapabilities.push(capabilities.power);
   } else {
     entityCategories.push('SWITCH');
     entityCapabilities.push(capabilities.power);
@@ -208,7 +212,7 @@ async function setDeviceState(request) {
   const entityId = request.directive.endpoint.endpointId;
   const domain = getDomain(request.directive.endpoint.endpointId);
   const command = request.directive.header.name;
-  const service = commandAlexaToHome(command);
+  const service = commandAlexaToHome(domain, command);
   let data = request.directive.payload;
   data = Object.keys(data).length ? data : { entity_id: entityId };
 
